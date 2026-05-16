@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Celvra – Beyond Storage, Beyond Limits</title>
+<link rel="stylesheet" href="style.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<!-- ANIMATED BG -->
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="orb orb4"></div>
+</div>
+<canvas id="gridCanvas"></canvas>
+
+<!-- NOTIFICATION SOUND -->
+<audio id="notifSound" preload="auto">
+  <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgmsGujFAyK2KTuayGTi8nXo20qIBKKyRciK+kfEcmIFmDp59zQiIcVH6inm9AIBhPeZuZbD4dFUtzlpRnOhoQQG6Pk2M5GAxDaIuRXzUWCzxjho5bMhIHNV6CilcuDwUvWH2GUykLAylTeYJOJgkBIk91fkkiCAAdSm94RR4GABdGandBGgQAEkBqczwXAwANO19sOBQCAQg3VWY0EQEABDJOXy8OAAABLU5ZKwsAAAEpRlMnCAAAASVBTiMIAAAAIT1JHwYAAAAePEQcBQAAAAA==" type="audio/wav"/>
+</audio>
+
+<!-- ===== AUTH SECTION ===== -->
+<div id="authSection" class="auth-section">
+  <div class="auth-container">
+    <div class="auth-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 40 40" fill="none"><polygon points="20,2 38,12 38,28 20,38 2,28 2,12" fill="none" stroke="url(#lg1)" stroke-width="2"/><polygon points="20,8 32,15 32,25 20,32 8,25 8,15" fill="url(#lg2)" opacity="0.3"/><circle cx="20" cy="20" r="4" fill="url(#lg1)"/><defs><linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#7b5ea7"/></linearGradient><linearGradient id="lg2" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#7b5ea7"/></linearGradient></defs></svg>
+      </div>
+      <div class="logo-text">
+        <h1>Celvra</h1>
+        <p>Beyond Storage, Beyond Limits</p>
+      </div>
+    </div>
+
+    <!-- TAB SWITCHER -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="showTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabRegister" onclick="showTab('register')">Create Account</button>
+      <div class="tab-indicator" id="tabIndicator"></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form" id="loginForm">
+      <div class="field-group">
+        <label>Email Address</label>
+        <div class="field-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"/></div>
+      </div>
+      <div class="field-group">
+        <label>Password</label>
+        <div class="field-wrap"><i class="fa-solid fa-shield-halved"></i><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/><button class="eye-btn" onclick="toggleEye('loginPass',this)"><i class="fa-solid fa-eye"></i></button></div>
+      </div>
+      <div class="remember-row">
+        <label class="checkbox-label"><input type="checkbox" id="rememberMe"/><span class="checkbox-custom"></span><span>Remember me</span></label>
+      </div>
+      <button class="btn-auth" onclick="doLogin()"><i class="fa-solid fa-right-to-bracket"></i> Enter Celvra</button>
+      <div class="auth-msg" id="loginMsg"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="auth-form hidden" id="registerForm">
+      <div class="field-group">
+        <label>Username</label>
+        <div class="field-wrap"><i class="fa-solid fa-user"></i><input type="text" id="regUsername" placeholder="Choose a username" autocomplete="username"/></div>
+      </div>
+      <div class="field-group">
+        <label>Email Address</label>
+        <div class="field-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email"/></div>
+      </div>
+      <div class="field-group">
+        <label>Password</label>
+        <div class="field-wrap"><i class="fa-solid fa-shield-halved"></i><input type="password" id="regPass" placeholder="Min 6 characters" autocomplete="new-password"/><button class="eye-btn" onclick="toggleEye('regPass',this)"><i class="fa-solid fa-eye"></i></button></div>
+      </div>
+      <button class="btn-auth" onclick="doRegister()"><i class="fa-solid fa-vault"></i> Create My Vault</button>
+      <div class="auth-msg" id="registerMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="appSection" class="app-section hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-logo">
+      <div class="logo-mark small">
+        <svg viewBox="0 0 40 40" fill="none"><polygon points="20,2 38,12 38,28 20,38 2,28 2,12" fill="none" stroke="url(#lg3)" stroke-width="2"/><circle cx="20" cy="20" r="4" fill="url(#lg3)"/><defs><linearGradient id="lg3" x1="0" y1="0" x2="40" y2="40"><stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#7b5ea7"/></linearGradient></defs></svg>
+      </div>
+      <span>Celvra</span>
+    </div>
+    <nav class="sb-nav">
+      <a class="sb-item active" data-page="dashboard" onclick="goPage('dashboard',this)"><i class="fa-solid fa-house-chimney"></i><span>Dashboard</span></a>
+      <a class="sb-item" data-page="photos" onclick="goPage('photos',this)"><i class="fa-solid fa-images"></i><span>Photos</span></a>
+      <a class="sb-item" data-page="videos" onclick="goPage('videos',this)"><i class="fa-solid fa-clapperboard"></i><span>Videos</span></a>
+      <a class="sb-item" data-page="music" onclick="goPage('music',this)"><i class="fa-solid fa-headphones"></i><span>Music</span></a>
+      <a class="sb-item" data-page="contacts" onclick="goPage('contacts',this)"><i class="fa-solid fa-address-book"></i><span>Contacts</span></a>
+      <a class="sb-item" data-page="documents" onclick="goPage('documents',this)"><i class="fa-solid fa-folder-open"></i><span>Documents</span></a>
+      <a class="sb-item" data-page="links" onclick="goPage('links',this)"><i class="fa-solid fa-link"></i><span>Links</span></a>
+      <a class="sb-item" data-page="transfer" onclick="goPage('transfer',this)"><i class="fa-solid fa-paper-plane"></i><span>Transfer</span></a>
+      <a class="sb-item" data-page="notifications" onclick="goPage('notifications',this)"><i class="fa-solid fa-bell"></i><span>Notifications <span class="notif-badge hidden" id="sbBadge"></span></span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user" id="sbUser"></div>
+      <button class="sb-logout" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </aside>
+
+  <!-- MOBILE TOPBAR -->
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div class="topbar-logo">Celvra</div>
+    <button class="topbar-notif" onclick="goPage('notifications',null)">
+      <i class="fa-solid fa-bell"></i>
+      <span class="notif-dot hidden" id="topDot"></span>
+    </button>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ---- DASHBOARD ---- -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h2 class="page-title">Dashboard</h2>
+        <p class="page-sub" id="dashGreet"></p>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="dash-recent">
+        <h3 class="section-label">Recent Files</h3>
+        <div class="recent-list" id="recentList"><p class="empty-state"><i class="fa-solid fa-box-open"></i> No files yet. Start uploading!</p></div>
+      </div>
+    </section>
+
+    <!-- ---- PHOTOS ---- -->
+    <section class="page hidden" id="page-photos">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-images"></i> Photos</h2>
+      </div>
+      <div class="toolbar">
+        <div class="upload-zone" id="photoUpload" onclick="triggerUpload('photoInput','photos')">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload Photos</span>
+          <small>JPG, PNG, GIF, WEBP, SVG</small>
+          <input type="file" id="photoInput" multiple accept="image/*" onchange="handleUpload(event,'photos')" hidden/>
+        </div>
+        <button class="btn-folder" onclick="createFolder('photos')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+        <div class="send-bar">
+          <input type="email" id="sendEmailPhotos" placeholder="Recipient email..." class="send-input"/>
+          <button class="btn-send-file" onclick="sendSelectedFiles('photos')"><i class="fa-solid fa-paper-plane"></i> Send Selected</button>
+        </div>
+      </div>
+      <div class="file-area" id="photosArea"></div>
+    </section>
+
+    <!-- ---- VIDEOS ---- -->
+    <section class="page hidden" id="page-videos">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-clapperboard"></i> Videos</h2>
+      </div>
+      <div class="toolbar">
+        <div class="upload-zone" onclick="triggerUpload('videoInput','videos')">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload Videos</span>
+          <small>MP4, MKV, AVI, MOV, WEBM</small>
+          <input type="file" id="videoInput" multiple accept="video/*" onchange="handleUpload(event,'videos')" hidden/>
+        </div>
+        <button class="btn-folder" onclick="createFolder('videos')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+        <div class="send-bar">
+          <input type="email" id="sendEmailVideos" placeholder="Recipient email..." class="send-input"/>
+          <button class="btn-send-file" onclick="sendSelectedFiles('videos')"><i class="fa-solid fa-paper-plane"></i> Send Selected</button>
+        </div>
+      </div>
+      <div class="file-area" id="videosArea"></div>
+    </section>
+
+    <!-- ---- MUSIC ---- -->
+    <section class="page hidden" id="page-music">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-headphones"></i> Music</h2>
+      </div>
+      <div class="toolbar">
+        <div class="upload-zone" onclick="triggerUpload('musicInput','music')">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload Music</span>
+          <small>MP3, WAV, FLAC, AAC, OGG</small>
+          <input type="file" id="musicInput" multiple accept="audio/*" onchange="handleUpload(event,'music')" hidden/>
+        </div>
+        <button class="btn-folder" onclick="createFolder('music')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+        <div class="send-bar">
+          <input type="email" id="sendEmailMusic" placeholder="Recipient email..." class="send-input"/>
+          <button class="btn-send-file" onclick="sendSelectedFiles('music')"><i class="fa-solid fa-paper-plane"></i> Send Selected</button>
+        </div>
+      </div>
+      <div class="file-area" id="musicArea"></div>
+    </section>
+
+    <!-- ---- CONTACTS ---- -->
+    <section class="page hidden" id="page-contacts">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-address-book"></i> Contacts</h2>
+      </div>
+      <div class="toolbar">
+        <div class="upload-zone" onclick="triggerUpload('contactInput','contacts')">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload vCard Files</span>
+          <small>Only .vcf files accepted</small>
+          <input type="file" id="contactInput" multiple accept=".vcf" onchange="handleUpload(event,'contacts')" hidden/>
+        </div>
+        <div class="send-bar">
+          <input type="email" id="sendEmailContacts" placeholder="Recipient email..." class="send-input"/>
+          <button class="btn-send-file" onclick="sendSelectedFiles('contacts')"><i class="fa-solid fa-paper-plane"></i> Send Selected</button>
+        </div>
+      </div>
+      <div class="file-area" id="contactsArea"></div>
+    </section>
+
+    <!-- ---- DOCUMENTS ---- -->
+    <section class="page hidden" id="page-documents">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-folder-open"></i> Documents</h2>
+      </div>
+      <div class="toolbar">
+        <div class="upload-zone" onclick="triggerUpload('docInput','documents')">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Upload Documents</span>
+          <small>PDF, DOCX, XLSX, TXT, APK, EXE</small>
+          <input type="file" id="docInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.apk,.exe" onchange="handleUpload(event,'documents')" hidden/>
+        </div>
+        <button class="btn-folder" onclick="createFolder('documents')"><i class="fa-solid fa-folder-plus"></i> New Folder</button>
+        <div class="send-bar">
+          <input type="email" id="sendEmailDocuments" placeholder="Recipient email..." class="send-input"/>
+          <button class="btn-send-file" onclick="sendSelectedFiles('documents')"><i class="fa-solid fa-paper-plane"></i> Send Selected</button>
+        </div>
+      </div>
+      <div class="file-area" id="documentsArea"></div>
+    </section>
+
+    <!-- ---- LINKS ---- -->
+    <section class="page hidden" id="page-links">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-link"></i> Important Links</h2>
+      </div>
+      <div class="toolbar">
+        <div class="link-add-form">
+          <input type="text" id="linkName" placeholder="Link name / label" class="send-input"/>
+          <input type="url" id="linkUrl" placeholder="https://..." class="send-input"/>
+          <button class="btn-auth small" onclick="addLink()"><i class="fa-solid fa-plus"></i> Add Link</button>
+        </div>
+      </div>
+      <div class="links-list" id="linksArea"></div>
+    </section>
+
+    <!-- ---- TRANSFER ---- -->
+    <section class="page hidden" id="page-transfer">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-paper-plane"></i> Transfer Files</h2>
+        <p class="page-sub">Send files to any Celvra user by their email</p>
+      </div>
+      <div class="transfer-panel">
+        <div class="field-group">
+          <label>Recipient Email</label>
+          <div class="field-wrap"><i class="fa-solid fa-at"></i><input type="email" id="transferEmail" placeholder="recipient@email.com"/></div>
+        </div>
+        <div class="field-group">
+          <label>Select File(s) to Send</label>
+          <div class="upload-zone small" onclick="document.getElementById('transferInput').click()">
+            <i class="fa-solid fa-paperclip"></i>
+            <span id="transferLabel">Click to choose files</span>
+            <input type="file" id="transferInput" multiple onchange="handleTransferSelect(event)" hidden/>
+          </div>
+        </div>
+        <button class="btn-auth" onclick="doTransfer()"><i class="fa-solid fa-paper-plane"></i> Send Now</button>
+        <div class="auth-msg" id="transferMsg"></div>
+      </div>
+    </section>
+
+    <!-- ---- NOTIFICATIONS ---- -->
+    <section class="page hidden" id="page-notifications">
+      <div class="page-header">
+        <h2 class="page-title"><i class="fa-solid fa-bell"></i> Notifications</h2>
+        <button class="btn-clear-all" onclick="clearAllNotifs()"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+      </div>
+      <div class="notif-list" id="notifList"><p class="empty-state"><i class="fa-solid fa-bell-slash"></i> No notifications</p></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Incoming File Modal -->
+<div class="modal-backdrop hidden" id="incomingModal">
+  <div class="modal-box anim-pop">
+    <div class="modal-icon incoming"><i class="fa-solid fa-box-archive"></i></div>
+    <h3 id="incomingTitle">You received files!</h3>
+    <p id="incomingBody"></p>
+    <div class="modal-files" id="incomingFiles"></div>
+    <div class="modal-actions">
+      <button class="btn-auth" onclick="acceptIncoming()"><i class="fa-solid fa-check"></i> Accept & Save</button>
+      <button class="btn-secondary" onclick="closeModal('incomingModal')">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- Folder Name Modal -->
+<div class="modal-backdrop hidden" id="folderModal">
+  <div class="modal-box anim-pop">
+    <div class="modal-icon"><i class="fa-solid fa-folder-plus"></i></div>
+    <h3>Create New Folder</h3>
+    <div class="field-wrap mt1"><i class="fa-solid fa-pen"></i><input type="text" id="folderNameInput" placeholder="Folder name..."/></div>
+    <div class="modal-actions">
+      <button class="btn-auth" onclick="confirmFolder()"><i class="fa-solid fa-folder-plus"></i> Create</button>
+      <button class="btn-secondary" onclick="closeModal('folderModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pop-up Notification Toast -->
+<div class="toast-notif hidden" id="toastNotif">
+  <div class="toast-inner">
+    <div class="toast-icon"><i class="fa-solid fa-bell"></i></div>
+    <div class="toast-text">
+      <strong id="toastTitle">New Notification</strong>
+      <p id="toastBody">You have a new notification</p>
+    </div>
+    <button class="toast-go" onclick="goPage('notifications',null);hideToast()">View</button>
+    <button class="toast-close" onclick="hideToast()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
+
+<!-- ===== ABOUT PAGE ===== -->
+<div class="about-fab" onclick="goPage('about',null)" title="About Celvra">
+  <i class="fa-solid fa-circle-info"></i>
+</div>
+<section class="page hidden" id="page-about" style="position:fixed;inset:0;z-index:9999;background:var(--bg);overflow-y:auto;padding:4rem 2rem;">
+  <button onclick="goPage('dashboard',null)" style="margin-bottom:2rem;" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back</button>
+  <div class="about-card">
+    <div class="about-logo">
+      <svg viewBox="0 0 80 80" fill="none" width="80"><polygon points="40,4 76,24 76,56 40,76 4,56 4,24" fill="none" stroke="url(#lga)" stroke-width="2.5"/><polygon points="40,16 64,30 64,50 40,64 16,50 16,30" fill="url(#lgb)" opacity="0.2"/><circle cx="40" cy="40" r="8" fill="url(#lga)"/><defs><linearGradient id="lga" x1="0" y1="0" x2="80" y2="80"><stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#7b5ea7"/></linearGradient><linearGradient id="lgb" x1="0" y1="0" x2="80" y2="80"><stop offset="0%" stop-color="#00f5c4"/><stop offset="100%" stop-color="#7b5ea7"/></linearGradient></defs></svg>
+    </div>
+    <h1 class="about-name">Celvra</h1>
+    <p class="about-slogan">Beyond Storage, Beyond Limits</p>
+    <div class="about-divider"></div>
+    <div class="about-info">
+      <div class="about-row"><span>Developer</span><strong>Kerolos Adly</strong></div>
+      <div class="about-row"><span>Year</span><strong>2026</strong></div>
+      <div class="about-row"><span>Version</span><strong>1.0.0</strong></div>
+      <div class="about-row"><span>Platform</span><strong>Web – GitHub Pages Ready</strong></div>
+      <div class="about-row"><span>Privacy</span><strong>100% Client-Side, Data Stays With You</strong></div>
+    </div>
+    <div class="about-divider"></div>
+    <p class="about-desc">Celvra is a private, personal cloud platform designed to give users complete control over their photos, videos, music, documents, contacts, and more — with zero compromise on privacy. Built with a bold, animated interface and a focus on simplicity and power.</p>
+    <p class="about-copy">© 2026 Celvra — Developed by <strong>Kerolos Adly</strong>. All rights reserved.</p>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
